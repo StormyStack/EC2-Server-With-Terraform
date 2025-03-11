@@ -16,3 +16,8 @@ variable "env_prefix" {
   description = "The prefix for the environment."
   type        = string
 }
+
+variable "my-ip" {
+  description = "The IP address to allow SSH access."
+  type        = string
+}
