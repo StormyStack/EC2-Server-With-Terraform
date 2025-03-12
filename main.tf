@@ -52,6 +52,7 @@ resource "aws_route_table_association" "myapp-rt-assoc" {
 }
 
 resource "aws_security_group" "myapp-sg" {
+  name = "myapp-sg"
   vpc_id = aws_vpc.myapp_vpc.id
   ingress {
     from_port   = 22
