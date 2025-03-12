@@ -34,25 +34,18 @@ resource "aws_internet_gateway" "myapp-igw" {
     }
 }
 
-resource "aws_route_table" "myapp-rt" {
-    vpc_id = aws_vpc.myapp_vpc.id
+resource "aws_default_route_table" "myapp-default-rt" {
+    default_route_table_id = aws_vpc.myapp_vpc.default_route_table_id
     route {
         cidr_block = "0.0.0.0/0"
         gateway_id = aws_internet_gateway.myapp-igw.id
     }
     tags = {
-        Name = "${var.env_prefix}-rt"
+        Name = "${var.env_prefix}-default-rt"
     }
 }
 
-resource "aws_route_table_association" "myapp-rt-assoc" {
-    subnet_id      = aws_subnet.myapp_subnet-1.id
-    route_table_id = aws_route_table.myapp-rt.id
-  
-}
-
-resource "aws_security_group" "myapp-sg" {
-  name = "myapp-sg"
+resource "aws_default_security_group" "default-sg" {
   vpc_id = aws_vpc.myapp_vpc.id
   ingress {
     from_port   = 22
@@ -73,6 +66,6 @@ resource "aws_security_group" "myapp-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "${var.env_prefix}-sg"
+    Name = "${var.env_prefix}-default-sg"
   }
 }
