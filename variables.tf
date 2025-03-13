@@ -31,3 +31,8 @@ variable "public_key_location" {
   description = "The location of the public key."
   type        = string
 }
+
+variable "private_key_location" {
+  description = "The location of the private key."
+  type        = string
+}

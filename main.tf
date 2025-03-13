@@ -100,7 +100,25 @@ resource "aws_instance" "myapp-server" {
   availability_zone           = var.availability_zones
   associate_public_ip_address = true
   key_name                    = aws_key_pair.ssh-key.key_name
-  user_data                   =file("entrypoint.sh")
+  connection {
+    type = "ssh"
+    user = "ubuntu"
+    host = self.public_ip
+    private_key = file(var.private_key_location)
+  }
+
+  provisioner "file" {
+    source      = "entrypoint.sh"
+    destination = "/tmp/entrypoint.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/entrypoint.sh",
+      "sudo /tmp/entrypoint.sh"
+    ]
+  }
+
   tags = {
     Name = "${var.env_prefix}-server"
   }
