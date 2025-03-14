@@ -17,4 +17,3 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo systemctl enable --now docker
 
 sudo docker run --name myapp_nginx -d -p 8080:80 nginx
-EOF

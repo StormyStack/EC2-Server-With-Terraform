@@ -16,33 +16,15 @@ resource "aws_vpc" "myapp_vpc" {
   tags = {
     Name = "${var.env_prefix}-vpc"
   }
-}
+} 
 
-resource "aws_subnet" "myapp_subnet-1" {
-  vpc_id            = aws_vpc.myapp_vpc.id
-  cidr_block        = var.subnet_cidr_blocks
-  availability_zone = var.availability_zones
-  tags = {
-    Name = "${var.env_prefix}-subnet-1"
-  }
-}
-
-resource "aws_internet_gateway" "myapp-igw" {
+module "myapp-subnet" {
+  source = "./modules/subnet"
   vpc_id = aws_vpc.myapp_vpc.id
-  tags = {
-    Name = "${var.env_prefix}-igw"
-  }
-}
-
-resource "aws_default_route_table" "myapp-default-rt" {
+  env_prefix = var.env_prefix
+  availability_zones = var.availability_zones
+  subnet_cidr_blocks = var.subnet_cidr_blocks
   default_route_table_id = aws_vpc.myapp_vpc.default_route_table_id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.myapp-igw.id
-  }
-  tags = {
-    Name = "${var.env_prefix}-default-rt"
-  }
 }
 
 resource "aws_default_security_group" "default-sg" {
@@ -83,9 +65,7 @@ data "aws_ami" "LatestUbuntu" {
   }
 }
 
-output "ami_id" {
-  value = data.aws_ami.LatestUbuntu.id
-}
+
 
 resource "aws_key_pair" "ssh-key" {
   key_name   = "myapp-key-pair"
@@ -95,7 +75,7 @@ resource "aws_key_pair" "ssh-key" {
 resource "aws_instance" "myapp-server" {
   ami                         = data.aws_ami.LatestUbuntu.id
   instance_type               = var.instance_type
-  subnet_id                   = aws_subnet.myapp_subnet-1.id
+  subnet_id                   = module.myapp-subnet.subnet_id
   vpc_security_group_ids      = [aws_default_security_group.default-sg.id]
   availability_zone           = var.availability_zones
   associate_public_ip_address = true
@@ -104,8 +84,4 @@ resource "aws_instance" "myapp-server" {
   tags = {
     Name = "${var.env_prefix}-server"
   }
-}
-
-output "public_ip" {
-  value = aws_instance.myapp-server.public_ip 
 }
