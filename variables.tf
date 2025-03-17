@@ -31,3 +31,8 @@ variable "public_key_location" {
   description = "The location of the public key."
   type        = string
 }
+
+variable "image_name" {
+  description = "The name of the image to use for the EC2 instance."
+  type        = string
+}
